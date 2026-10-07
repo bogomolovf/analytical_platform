@@ -1,0 +1,11 @@
+# Конфигурация Streamlit для дашборда продуктовой аналитики.
+[theme]
+base = "light"
+primaryColor = "#4C78A8"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true

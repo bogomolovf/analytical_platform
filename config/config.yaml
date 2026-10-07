@@ -1,0 +1,127 @@
+# ============================================================================
+# Конфигурация продуктовой аналитической платформы.
+# Все параметры генерации, путей и бизнес-логики собраны здесь, чтобы проект
+# был полностью воспроизводим и настраивался без правки кода.
+# ============================================================================
+
+project:
+  name: "product-analytics-platform"
+  # Фиксированный random seed -> детерминированная генерация данных.
+  seed: 42
+
+paths:
+  # Каталог с сырыми выгрузками (CSV), которые имитируют экспорт из трекера.
+  raw_dir: "data/raw"
+  # Файл аналитической БД DuckDB (создаётся пайплайном).
+  warehouse: "data/warehouse.duckdb"
+
+generator:
+  # Горизонт симуляции: ~12 месяцев продуктовой истории.
+  start_date: "2024-09-01"
+  end_date: "2025-08-31"
+  # Базовое число регистраций в первый день (дальше растёт по тренду).
+  base_daily_signups: 18
+  # Годовой рост воронки привлечения (1.8 = +80% за год).
+  yearly_growth: 1.8
+  # Амплитуда недельной сезонности (будни > выходные).
+  weekly_seasonality: 0.35
+  # Амплитуда годовой сезонности (спад летом, рост осенью/зимой).
+  yearly_seasonality: 0.20
+  # Маркетинговые всплески: (дата, множитель длительностью ~ 5 дней).
+  marketing_spikes:
+    - { date: "2024-11-25", multiplier: 3.0 }   # Black Friday
+    - { date: "2025-01-06", multiplier: 2.2 }    # New Year push
+    - { date: "2025-04-15", multiplier: 1.9 }    # Spring campaign
+
+  # Распределение канала привлечения.
+  channels:
+    organic: 0.45
+    paid: 0.35
+    referral: 0.20
+
+  # Распределение гео (доля пользователей).
+  geos:
+    US: 0.30
+    GB: 0.12
+    DE: 0.10
+    FR: 0.08
+    IN: 0.14
+    BR: 0.08
+    RU: 0.08
+    Other: 0.10
+
+  # Распределение устройств.
+  devices:
+    desktop: 0.55
+    mobile: 0.38
+    tablet: 0.07
+
+  # Поведенческие сегменты: доля, дневная активность, склонность к оплате.
+  behavior_segments:
+    power:
+      share: 0.15
+      base_return_prob: 0.55     # высокая вероятность вернуться
+      retention_halflife_days: 120
+      sessions_per_active_day: [1, 4]
+      events_per_session: [4, 12]
+      convert_prob: 0.45         # вероятность стать платящим
+    casual:
+      share: 0.55
+      base_return_prob: 0.18
+      retention_halflife_days: 35
+      sessions_per_active_day: [1, 2]
+      events_per_session: [2, 6]
+      convert_prob: 0.08
+    one_shot:
+      share: 0.30
+      base_return_prob: 0.04
+      retention_halflife_days: 5
+      sessions_per_active_day: [1, 1]
+      events_per_session: [1, 3]
+      convert_prob: 0.01
+
+  # Продуктовые feature-события и их относительная частота внутри сессии.
+  feature_events:
+    view_dashboard: 0.34
+    create_project: 0.18
+    run_report: 0.20
+    invite_teammate: 0.10
+    export_data: 0.18
+
+  # Тарифные планы и цена подписки (в USD, MRR за пользователя).
+  plans:
+    free: 0
+    pro: 29
+    enterprise: 99
+  # Доля upgrade в enterprise среди всех, кто конвертировался.
+  enterprise_share_of_paid: 0.25
+
+  # Ежемесячная вероятность оттока платящего пользователя (subscription churn).
+  monthly_paid_churn: 0.06
+
+  # Параметры «грязи» в данных (для осмысленного шага очистки).
+  dirtiness:
+    duplicate_event_rate: 0.012    # доля продублированных событий
+    duplicate_user_rate: 0.006     # доля продублированных строк пользователей
+    null_geo_rate: 0.03            # доля пропусков в гео
+    null_device_rate: 0.02         # доля пропусков в устройстве
+    future_timestamp_rate: 0.001   # редкие «события из будущего»
+    negative_amount_rate: 0.004    # аномальные суммы покупок
+    bot_outlier_users: 5           # несколько ботов с аномальным числом событий
+
+pipeline:
+  # Порядок слоёв, которые исполняет раннер (каждый слой = каталог в sql/).
+  layers:
+    - staging
+    - marts
+
+metrics:
+  # Шаги воронки активации (в порядке следования).
+  activation_funnel:
+    - signup
+    - login
+    - create_project
+    - run_report
+    - purchase
+  # Окна ретеншена (в днях) для day-N retention.
+  retention_days: [1, 3, 7, 14, 30, 60, 90]

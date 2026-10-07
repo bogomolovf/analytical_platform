@@ -1,0 +1,59 @@
+name: CI
+
+# Линтинг и тесты на каждый push и pull request.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ruff (lint)
+        run: ruff check .
+
+      - name: Black (format check)
+        run: black --check .
+
+      - name: Pytest
+        # Тесты сами генерируют небольшой датасет, строят витрины и метрики,
+        # так что покрывают весь ELT-пайплайн end-to-end.
+        run: pytest -q
+
+  smoke-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: End-to-end smoke (data -> marts -> metrics)
+        run: |
+          python -m src.generator.generate --users 800
+          python -m src.pipeline.runner
+          python -m src.metrics.metrics
