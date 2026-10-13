@@ -1,4 +1,4 @@
-"""Страница «Воронка активации»: пошаговая конверсия signup → purchase."""
+"""Страница «Воронка активации»: пошаговая конверсия signup -> purchase."""
 
 from __future__ import annotations
 
@@ -82,7 +82,7 @@ def render() -> None:
             {
                 "Шаг": label,
                 "Пользователей": lib.fmt_int(n),
-                "Конверсия с прошлого шага": lib.fmt_pct(n / prev) if prev else "—",
+                "Конверсия с прошлого шага": lib.fmt_pct(n / prev) if prev else "-",
                 "Конверсия от старта": lib.fmt_pct(n / top),
             }
         )

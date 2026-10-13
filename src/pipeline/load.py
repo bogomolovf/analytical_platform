@@ -1,7 +1,7 @@
 """Загрузка сырых CSV-выгрузок в DuckDB (слой ``raw``).
 
 Шаг E/L: сырые файлы из ``data/raw`` кладутся в таблицы ``raw_users`` и
-``raw_events`` «как есть», без очистки — очистка происходит на слое staging.
+``raw_events`` «как есть», без очистки - очистка происходит на слое staging.
 """
 
 from __future__ import annotations

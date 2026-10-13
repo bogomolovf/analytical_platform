@@ -30,8 +30,8 @@ def render() -> None:
 
     st.subheader("Когортная heatmap: недельное удержание")
     st.caption(
-        "Строка — когорта по неделе регистрации, столбец — N недель с момента "
-        "регистрации, значение — доля вернувшихся пользователей."
+        "Строка - когорта по неделе регистрации, столбец - N недель с момента "
+        "регистрации, значение - доля вернувшихся пользователей."
     )
 
     # Пересчёт когортного удержания под текущие фильтры.
@@ -147,8 +147,8 @@ def render() -> None:
             GROUP BY 1 ORDER BY d30 DESC
             """)
         figs = go.Figure()
-        figs.add_bar(x=seg["segment"], y=seg["d7"], name="≥ day-7", marker_color=lib.PALETTE[0])
-        figs.add_bar(x=seg["segment"], y=seg["d30"], name="≥ day-30", marker_color=lib.PALETTE[2])
+        figs.add_bar(x=seg["segment"], y=seg["d7"], name=">= day-7", marker_color=lib.PALETTE[0])
+        figs.add_bar(x=seg["segment"], y=seg["d30"], name=">= day-30", marker_color=lib.PALETTE[2])
         figs.update_layout(barmode="group", yaxis_tickformat=".0%", yaxis_title="Доля вернувшихся")
         st.plotly_chart(lib.style_fig(figs, template), width="stretch")
 

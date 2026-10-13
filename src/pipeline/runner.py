@@ -1,10 +1,10 @@
 """Мини dbt-раннер поверх DuckDB.
 
-Исполняет SQL-модели из каталога ``sql/`` слоями (staging → marts). Поддержан
+Исполняет SQL-модели из каталога ``sql/`` слоями (staging -> marts). Поддержан
 упрощённый Jinja-подобный синтаксис:
 
-* ``{{ ref('model_name') }}``      — ссылка на другую модель (таблицу);
-* ``{{ source('raw', 'events') }}`` — ссылка на сырую таблицу (``raw_events``).
+* ``{{ ref('model_name') }}``      - ссылка на другую модель (таблицу);
+* ``{{ source('raw', 'events') }}`` - ссылка на сырую таблицу (``raw_events``).
 
 Раннер:
 
@@ -153,7 +153,7 @@ def build(
     sql_root: Path | None = None,
     run_dq_tests: bool = True,
 ) -> dict:
-    """Полный прогон ELT: raw → staging → marts (+ опционально DQ-тесты).
+    """Полный прогон ELT: raw -> staging -> marts (+ опционально DQ-тесты).
 
     Args:
         cfg: Конфигурация проекта.

@@ -83,7 +83,7 @@ def render() -> None:
         fig2.update_layout(showlegend=False, yaxis_title="Выручка, ₽", xaxis_title=None)
         st.plotly_chart(lib.style_fig(fig2, template), width="stretch")
     with c2:
-        st.subheader("Конверсия free→paid по сегментам")
+        st.subheader("Конверсия free->paid по сегментам")
         by_seg = lib.query(f"""
             WITH {cte}
             SELECT u.behavior_segment AS segment,
@@ -95,7 +95,7 @@ def render() -> None:
             by_seg, x="segment", y="conv", color="segment", color_discrete_sequence=lib.PALETTE
         )
         fig3.update_layout(
-            showlegend=False, yaxis_tickformat=".0%", yaxis_title="Free→Paid", xaxis_title=None
+            showlegend=False, yaxis_tickformat=".0%", yaxis_title="Free->Paid", xaxis_title=None
         )
         st.plotly_chart(lib.style_fig(fig3, template), width="stretch")
 

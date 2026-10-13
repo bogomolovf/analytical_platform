@@ -3,8 +3,8 @@
 Это ядро проекта. Модуль имитирует ~12 месяцев жизни продукта и выгружает
 две «сырые» таблицы (как экспорт из событийного трекера):
 
-* ``raw_users.csv``  — пользователи с атрибутами привлечения;
-* ``raw_events.csv`` — событийный лог (signup / login / feature / purchase / churn).
+* ``raw_users.csv``  - пользователи с атрибутами привлечения;
+* ``raw_events.csv`` - событийный лог (signup / login / feature / purchase / churn).
 
 Что моделируется:
 
@@ -16,10 +16,10 @@
   регистрации (halflife зависит от сегмента).
 * Сессии: login + последовательность feature-событий с корректными
   таймстемпами внутри сессии.
-* Монетизация: конверсия free→paid, помесячные списания (MRR) и отток
+* Монетизация: конверсия free->paid, помесячные списания (MRR) и отток
   платящих (subscription churn).
 * Специально заложенная «грязь»: дубликаты, пропуски, будущие таймстемпы,
-  аномальные суммы, боты-выбросы — чтобы шаг очистки в пайплайне имел смысл.
+  аномальные суммы, боты-выбросы - чтобы шаг очистки в пайплайне имел смысл.
 
 Всё детерминировано относительно ``seed`` из конфига.
 """
@@ -107,7 +107,7 @@ def _build_users(rng: np.random.Generator, cfg: Config) -> pd.DataFrame:
     dates = pd.date_range(gen["start_date"], gen["end_date"], freq="D")
     lam = _signup_curve(dates, gen)
 
-    # Фактические регистрации в день — Пуассон вокруг ожидаемого значения.
+    # Фактические регистрации в день - Пуассон вокруг ожидаемого значения.
     daily_counts = rng.poisson(lam)
     total = int(daily_counts.sum())
 
@@ -157,8 +157,8 @@ def _simulate_user(
     """Смоделировать полный событийный поток одного пользователя.
 
     Возвращает список событий (dict-ов). Логика:
-    signup → активные дни с сессиями (login + feature-события) →
-    возможная конверсия в платящего с помесячными списаниями → отток.
+    signup -> активные дни с сессиями (login + feature-события) ->
+    возможная конверсия в платящего с помесячными списаниями -> отток.
     """
     gen = cfg.generator
     seg_cfg = gen["behavior_segments"][user["behavior_segment"]]
@@ -173,7 +173,7 @@ def _simulate_user(
     # --- signup + первый login в день регистрации ------------------------- #
     events.append(_mk_event(user_id, "signup", signup_ts, session_id=f"{user_id}_s0"))
 
-    # Определяем активные дни: день 0 активен всегда, дальше — по затуханию.
+    # Определяем активные дни: день 0 активен всегда, дальше - по затуханию.
     offsets = np.arange(1, lifespan_days + 1)
     halflife = seg_cfg["retention_halflife_days"]
     return_prob = seg_cfg["base_return_prob"] * 0.5 ** (offsets / halflife)
@@ -193,7 +193,7 @@ def _simulate_user(
         for _ in range(n_sessions):
             session_counter += 1
             session_id = f"{user_id}_s{session_counter}"
-            # Старт сессии — рабочие часы с шумом.
+            # Старт сессии - рабочие часы с шумом.
             start_sec = int(np.clip(rng.normal(14, 4), 0, 23.9) * 3600)
             cursor = day_start + pd.Timedelta(seconds=start_sec)
             # Каждая сессия начинается с login.
@@ -205,7 +205,7 @@ def _simulate_user(
                 cursor = cursor + pd.Timedelta(seconds=int(rng.integers(20, 360)))
                 events.append(_mk_event(user_id, feat, cursor, session_id=session_id))
 
-    # --- Монетизация: конверсия free→paid и помесячный MRR ---------------- #
+    # --- Монетизация: конверсия free->paid и помесячный MRR ---------------- #
     if rng.random() < seg_cfg["convert_prob"]:
         conv_offset = int(rng.exponential(25)) + 3
         if conv_offset <= lifespan_days:
@@ -324,7 +324,7 @@ def _inject_dirt(
         bad_idx = purchase_idx[neg]
         events.loc[bad_idx, "event_value"] = -events.loc[bad_idx, "event_value"].abs()
 
-    # Перемешиваем события и присваиваем глобальные event_id (с дублями внутри — ок,
+    # Перемешиваем события и присваиваем глобальные event_id (с дублями внутри - ок,
     # они снимаются в staging по бизнес-ключу).
     events = events.sample(frac=1.0, random_state=int(rng.integers(1e9))).reset_index(drop=True)
     events.insert(0, "event_id", [f"e_{i:09d}" for i in range(len(events))])
@@ -339,7 +339,7 @@ def generate(cfg: Config, n_users_override: int | None = None) -> GeneratedData:
 
     Args:
         cfg: Конфигурация проекта.
-        n_users_override: Если задано — жёстко ограничить число пользователей
+        n_users_override: Если задано - жёстко ограничить число пользователей
             (усечь сгенерированную когорту). Удобно для быстрых тестов.
 
     Returns:

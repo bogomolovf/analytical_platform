@@ -76,7 +76,7 @@ def load_config(path: str | Path | None = None) -> Config:
     """Прочитать YAML-конфиг и вернуть объект :class:`Config`.
 
     Args:
-        path: Путь к YAML-файлу. Если ``None`` — используется путь по умолчанию
+        path: Путь к YAML-файлу. Если ``None`` - используется путь по умолчанию
             ``config/config.yaml`` в корне репозитория.
 
     Returns:

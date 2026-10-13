@@ -56,7 +56,7 @@ def test_event_names_valid(small_config: Config) -> None:
 
 
 def test_every_user_has_signup(small_config: Config) -> None:
-    """У каждого пользователя ровно одно событие signup (до инъекции дублей — с запасом)."""
+    """У каждого пользователя ровно одно событие signup (до инъекции дублей - с запасом)."""
     data = generate(small_config)
     signups = data.events[data.events["event_name"] == "signup"]["user_id"].nunique()
     # Уникальных пользователей с signup не меньше, чем исходных без дублей строк.

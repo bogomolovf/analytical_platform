@@ -1,16 +1,16 @@
 """Слой продуктовых метрик.
 
 Поверх витрин (marts) считаются ключевые продуктовые метрики и материализуются
-в DuckDB как таблицы с префиксом ``metric_`` — дашборд затем просто читает их.
+в DuckDB как таблицы с префиксом ``metric_`` - дашборд затем просто читает их.
 
 Определения всех метрик описаны в ``METRICS.md``. Считаются:
 
-* ``metric_active_users``     — DAU / WAU / MAU и stickiness (DAU/MAU);
-* ``metric_retention_dayn``   — day-N retention по всей базе;
-* ``metric_activation_funnel``— воронка активации со ступенчатой конверсией;
-* ``metric_mrr``              — MRR по месяцам и планам, число платящих;
-* ``metric_segments``         — разбивка пользователей/выручки по сегментам;
-* ``metric_summary``          — единая строка headline-KPI (в т.ч. North Star).
+* ``metric_active_users``     - DAU / WAU / MAU и stickiness (DAU/MAU);
+* ``metric_retention_dayn``   - day-N retention по всей базе;
+* ``metric_activation_funnel``- воронка активации со ступенчатой конверсией;
+* ``metric_mrr``              - MRR по месяцам и планам, число платящих;
+* ``metric_segments``         - разбивка пользователей/выручки по сегментам;
+* ``metric_summary``          - единая строка headline-KPI (в т.ч. North Star).
 """
 
 from __future__ import annotations
@@ -123,7 +123,7 @@ def build_activation_funnel(con: duckdb.DuckDBPyConnection, steps: list[str]) ->
 
     Пользователь «дошёл» до шага k, только если совершил все предыдущие шаги
     (1..k) хотя бы раз. Это гарантирует монотонно убывающую воронку и корректную
-    пошаговую конверсию — как в продуктовой аналитике.
+    пошаговую конверсию - как в продуктовой аналитике.
     """
     # Булевы флаги «совершал ли пользователь событие-шаг».
     flag_cols = ",\n            ".join(
@@ -167,7 +167,7 @@ def build_mrr(con: duckdb.DuckDBPyConnection, analysis_end: str) -> pd.DataFrame
     """MRR по месяцам и планам.
 
     Каждая активная подписка порождает одно списание в месяц, поэтому сумма
-    положительных покупок за месяц = MRR. Дополнительно — число платящих.
+    положительных покупок за месяц = MRR. Дополнительно - число платящих.
     Хвост за границей окна анализа (неполные месяцы) отсекается.
     """
     con.execute(f"""
@@ -227,7 +227,7 @@ def build_summary(con: duckdb.DuckDBPyConnection, analysis_end: str) -> pd.DataF
     """Свод headline-метрик, включая North Star (WAU на дату окончания окна).
 
     «Текущие» значения берутся на референсную дату ``analysis_end`` (конец окна
-    генерации), а не на самый последний таймстемп — так KPI не искажаются
+    генерации), а не на самый последний таймстемп - так KPI не искажаются
     разреженным хвостом поздних служебных событий.
     """
     con.execute(f"""
@@ -293,7 +293,7 @@ def build_metrics(cfg: Config) -> dict[str, pd.DataFrame]:
             "mrr": build_mrr(con, analysis_end),
             "segments": build_segments(con),
         }
-        # summary зависит от active_users и mrr — считаем последним.
+        # summary зависит от active_users и mrr - считаем последним.
         result["summary"] = build_summary(con, analysis_end)
     finally:
         con.close()
@@ -317,8 +317,8 @@ def main() -> None:
     print(f"[metrics] free->paid:           {summary['free_to_paid_rate']:.1%}")
     print(f"[metrics] отток платящих:       {summary['paid_churn_rate']:.1%}")
     print(f"[metrics] North Star (WAU):     {int(summary['north_star_wau']):,}")
-    print(f"[metrics] текущий MRR:          ${summary['current_mrr']:,.0f}")
-    print(f"[metrics] total revenue:        ${summary['total_revenue']:,.0f}")
+    print(f"[metrics] текущий MRR:          {summary['current_mrr']:,.0f} ₽")
+    print(f"[metrics] выручка всего:         {summary['total_revenue']:,.0f} ₽")
 
 
 if __name__ == "__main__":

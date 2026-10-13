@@ -72,7 +72,7 @@ class Filters:
     segments: list[str]
 
     def users_cte(self) -> str:
-        """SQL-фрагмент CTE ``fu`` — множество user_id, прошедших сегмент-фильтры."""
+        """SQL-фрагмент CTE ``fu`` - множество user_id, прошедших сегмент-фильтры."""
         conds = []
         if self.channels:
             vals = ", ".join(f"'{c}'" for c in self.channels)
@@ -141,7 +141,7 @@ def sidebar_filters() -> Filters:
 
     st.sidebar.caption(
         "Пустой фильтр = все значения. Фильтры по сегментам применяются "
-        "к пользователям, фильтр по периоду — к событиям."
+        "к пользователям, фильтр по периоду - к событиям."
     )
     return Filters(date_start, date_end, channels, plans, countries, segments)
 
@@ -187,7 +187,7 @@ def kpi_row(items: list[tuple[str, str, str | None]]) -> None:
 
 def page_config(title: str) -> None:
     """Стандартная конфигурация страницы дашборда."""
-    st.set_page_config(page_title=f"Аналитическая платформа — {title}", layout="wide")
+    st.set_page_config(page_title=f"Аналитическая платформа - {title}", layout="wide")
 
 
 def require_warehouse() -> bool:

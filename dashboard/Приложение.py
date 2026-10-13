@@ -1,4 +1,4 @@
-"""Дашборд продуктовой аналитики — страница «Обзор».
+"""Дашборд продуктовой аналитики - страница «Обзор».
 
 North Star + KPI-плитки + headline-графики роста, удержания и выручки.
 Запуск: ``streamlit run "dashboard/Приложение.py"`` (или ``make dashboard``).
@@ -97,7 +97,7 @@ def render() -> None:
 
     left, right = st.columns([2, 1])
     with left:
-        st.subheader("North Star — Weekly Active Users")
+        st.subheader("North Star - Weekly Active Users")
         fig = go.Figure()
         fig.add_scatter(
             x=au["activity_date"],
